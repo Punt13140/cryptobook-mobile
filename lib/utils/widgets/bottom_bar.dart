@@ -1,6 +1,6 @@
 import 'package:badges/badges.dart';
 import 'package:cryptobook/view/dashboard_screen.dart';
-import 'package:cryptobook/view/positions_screen.dart';
+import 'package:cryptobook/view/positions/positions_screen.dart';
 import 'package:cryptobook/view/settings_screen.dart';
 import 'package:flutter/material.dart';
 

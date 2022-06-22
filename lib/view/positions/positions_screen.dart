@@ -1,7 +1,9 @@
+import 'package:badges/badges.dart';
 import 'package:cryptobook/blocs/bloc_positions.dart';
+import 'package:cryptobook/model/cryptocurrency.dart';
 import 'package:cryptobook/model/position/position.dart';
-import 'package:cryptobook/utils/actions_list.dart';
 import 'package:cryptobook/utils/widgets/bottom_bar.dart';
+import 'package:cryptobook/view/positions/positions_coin_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -49,10 +51,12 @@ class CryptoOpenedWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<PositionsBloc, PositionsBlocState>(
-      buildWhen: (oldState, newState) => oldState.lstPosCryptoOpened.isEmpty,
+      buildWhen: (oldState, newState) => oldState.groupedPosCryptoOpened.isEmpty,
       builder: (_, PositionsBlocState state) {
-        if (state.lstPosCryptoOpened.isNotEmpty) {
-          return ListViewPositions(positions: state.lstPosCryptoOpened);
+        if (state.groupedPosCryptoOpened.isNotEmpty) {
+          return ListViewPositionsGrouped(
+            positions: state.groupedPosCryptoOpened,
+          );
         } else {
           return const Center(child: CircularProgressIndicator.adaptive());
         }
@@ -67,10 +71,12 @@ class StableOpenedWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<PositionsBloc, PositionsBlocState>(
-      buildWhen: (oldState, newState) => oldState.lstPosStableOpened.isEmpty,
+      buildWhen: (oldState, newState) => oldState.groupedPosStableOpened.isEmpty,
       builder: (_, PositionsBlocState state) {
-        if (state.lstPosStableOpened.isNotEmpty) {
-          return ListViewPositions(positions: state.lstPosStableOpened);
+        if (state.groupedPosStableOpened.isNotEmpty) {
+          return ListViewPositionsGrouped(
+            positions: state.groupedPosStableOpened,
+          );
         } else {
           return const Center(child: CircularProgressIndicator.adaptive());
         }
@@ -85,10 +91,12 @@ class ClosedWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<PositionsBloc, PositionsBlocState>(
-      buildWhen: (oldState, newState) => oldState.lstPosClosed.isEmpty,
+      buildWhen: (oldState, newState) => oldState.groupedPosClosed.isEmpty,
       builder: (_, PositionsBlocState state) {
-        if (state.lstPosClosed.isNotEmpty) {
-          return ListViewPositions(positions: state.lstPosClosed);
+        if (state.groupedPosClosed.isNotEmpty) {
+          return ListViewPositionsGrouped(
+            positions: state.groupedPosClosed,
+          );
         } else {
           return const Center(child: CircularProgressIndicator.adaptive());
         }
@@ -97,9 +105,9 @@ class ClosedWidget extends StatelessWidget {
   }
 }
 
-class ListViewPositions extends StatelessWidget {
-  const ListViewPositions({Key? key, required this.positions}) : super(key: key);
-  final List<Position> positions;
+class ListViewPositionsGrouped extends StatelessWidget {
+  const ListViewPositionsGrouped({Key? key, required this.positions}) : super(key: key);
+  final Map<Cryptocurrency, Map<String, dynamic>> positions;
 
   @override
   Widget build(BuildContext context) {
@@ -109,40 +117,36 @@ class ListViewPositions extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 4),
         itemCount: positions.length,
         itemBuilder: (BuildContext context, int index) {
+          Cryptocurrency coin = positions.keys.elementAt(index);
+          double value = coin.priceUsd * positions[coin]!['nbTotal'];
+
           return Card(
             child: ListTile(
-              onTap: () async {
-                showDialog(
-                    context: context,
-                    builder: (context) {
-                      return PositionDialogContent(position: positions[index]);
-                    });
+              onTap: () {
+                Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, a1, a2) => PositionsByCoin(
+                        positions: positions[coin]!['positions'],
+                        coin: coin,
+                      ),
+                    ));
               },
-              leading: CircleAvatar(
-                radius: 16,
-                backgroundColor: Colors.white,
-                backgroundImage: NetworkImage(positions[index].coin.urlImgThumb),
+              leading: Badge(
+                badgeContent: Text(
+                  positions[coin]!['nbPositions'].toString(),
+                  style: TextStyle(color: Theme.of(context).primaryColor),
+                ),
+                badgeColor: Theme.of(context).colorScheme.secondary,
+                child: CircleAvatar(
+                  radius: 16,
+                  backgroundColor: Colors.white,
+                  backgroundImage: NetworkImage(coin.urlImgThumb),
+                ),
               ),
-              title: Text(
-                  '${positions[index].remainingCoins.toStringAsFixed(4)} ${positions[index].coin.symbol.toUpperCase()}'),
-              subtitle: Text('~ \$${positions[index].currentValue.toStringAsFixed(0)}'),
-              trailing: PopupMenuButton(
-                icon: const Icon(Icons.more_vert),
-                itemBuilder: (context) => [
-                  const PopupMenuItem(
-                    value: ActionsList.actionEdit,
-                    child: Text("Modifier"),
-                  ),
-                  const PopupMenuItem(
-                    value: ActionsList.actionClose,
-                    child: Text("Fermer la position"),
-                  ),
-                  const PopupMenuItem(
-                    value: ActionsList.actionDelete,
-                    child: Text("Supprimer la position"),
-                  )
-                ],
-              ),
+              title: Text('${positions[coin]!['nbTotal'].toStringAsFixed(4)} ${coin.symbol.toUpperCase()}'),
+              subtitle: Text('~ \$${value.toStringAsFixed(0)}'),
+              trailing: const Icon(Icons.arrow_right),
             ),
           );
         },
