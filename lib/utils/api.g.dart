@@ -81,6 +81,38 @@ class _RestClient implements RestClient {
     return value;
   }
 
+  @override
+  Future<FarmingSimpleList> getSimpleFarmings() async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    final _result = await _dio.fetch<Map<String, dynamic>>(
+        _setStreamType<FarmingSimpleList>(
+            Options(method: 'GET', headers: _headers, extra: _extra)
+                .compose(_dio.options, '/strategy_farmings',
+                    queryParameters: queryParameters, data: _data)
+                .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    final value = FarmingSimpleList.fromJson(_result.data!);
+    return value;
+  }
+
+  @override
+  Future<FarmingLpList> getLpFarmings() async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    final _result = await _dio.fetch<Map<String, dynamic>>(
+        _setStreamType<FarmingLpList>(
+            Options(method: 'GET', headers: _headers, extra: _extra)
+                .compose(_dio.options, '/strategy_lps',
+                    queryParameters: queryParameters, data: _data)
+                .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    final value = FarmingLpList.fromJson(_result.data!);
+    return value;
+  }
+
   RequestOptions _setStreamType<T>(RequestOptions requestOptions) {
     if (T != dynamic &&
         !(requestOptions.responseType == ResponseType.bytes ||

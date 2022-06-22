@@ -1,5 +1,9 @@
 import 'package:cryptobook/model/deposit/api_response_deposit.dart';
 import 'package:cryptobook/model/deposit/deposit.dart';
+import 'package:cryptobook/model/farming/lp/api_response_farming_lp.dart';
+import 'package:cryptobook/model/farming/lp/farming_lp.dart';
+import 'package:cryptobook/model/farming/simple/api_response_farming_simple.dart';
+import 'package:cryptobook/model/farming/simple/farming_simple.dart';
 import 'package:cryptobook/model/loan/api_response_loan.dart';
 import 'package:cryptobook/model/loan/loan.dart';
 import 'package:cryptobook/model/position/api_response_position.dart';
@@ -41,6 +45,12 @@ abstract class RestClient {
 
   @GET("/deposits")
   Future<DepositList> getDeposits();
+
+  @GET("/strategy_farmings")
+  Future<FarmingSimpleList> getSimpleFarmings();
+
+  @GET("/strategy_lps")
+  Future<FarmingLpList> getLpFarmings();
 }
 
 class NetworkManager {
@@ -122,6 +132,16 @@ class NetworkManager {
 
   Future<List<Deposit>> getDeposits() async {
     DepositList response = await api.getDeposits();
+    return response.lstObjects;
+  }
+
+  Future<List<FarmingSimple>> getSimpleFarmings() async {
+    FarmingSimpleList response = await api.getSimpleFarmings();
+    return response.lstObjects;
+  }
+
+  Future<List<FarmingLp>> getLpFarmings() async {
+    FarmingLpList response = await api.getLpFarmings();
     return response.lstObjects;
   }
 }

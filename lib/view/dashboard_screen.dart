@@ -290,10 +290,16 @@ class PositionsContent extends StatelessWidget {
           return SizedBox(
             width: MediaQuery.of(context).size.width,
             child: Wrap(
-              runSpacing: 20,
-              spacing: 20,
+              runSpacing: 15,
+              spacing: 10,
               alignment: WrapAlignment.spaceBetween,
               children: [
+                InfoCard(
+                  icon: const Icon(Icons.account_balance_wallet),
+                  label: 'Total',
+                  amount: state.total,
+                  fullWidth: true,
+                ),
                 InfoCard(
                   icon: const Icon(Icons.currency_bitcoin),
                   label: 'Crypto',
@@ -311,11 +317,6 @@ class PositionsContent extends StatelessWidget {
                   round: 0,
                 ),
                 InfoCard(
-                  icon: const Icon(Icons.account_balance_wallet),
-                  label: 'Total',
-                  amount: state.total,
-                ),
-                InfoCard(
                   icon: const Icon(Icons.real_estate_agent),
                   label: 'Loan',
                   amount: state.loan,
@@ -329,6 +330,11 @@ class PositionsContent extends StatelessWidget {
                   suffixAmount: '%',
                   round: 0,
                   colorAmount: true,
+                ),
+                InfoCard(
+                  icon: const Icon(Icons.price_change),
+                  label: 'Farming 1Y',
+                  amount: state.annualFarming,
                 ),
               ],
             ),
@@ -359,16 +365,17 @@ class ListPosition extends StatelessWidget {
 }
 
 class InfoCard extends StatelessWidget {
-  const InfoCard(
-      {Key? key,
-      required this.icon,
-      required this.label,
-      required this.amount,
-      this.colorAmount = false,
-      this.prefixAmount = "\$",
-      this.suffixAmount = "",
-      this.round = 2})
-      : super(key: key);
+  const InfoCard({
+    Key? key,
+    required this.icon,
+    required this.label,
+    required this.amount,
+    this.colorAmount = false,
+    this.prefixAmount = "\$",
+    this.suffixAmount = "",
+    this.round = 2,
+    this.fullWidth = false,
+  }) : super(key: key);
   final Icon icon;
   final String label;
   final String prefixAmount;
@@ -376,26 +383,27 @@ class InfoCard extends StatelessWidget {
   final String suffixAmount;
   final int round;
   final bool colorAmount;
+  final bool fullWidth;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      constraints: const BoxConstraints(minWidth: 140),
-      padding: const EdgeInsets.all(20.0),
+      constraints: BoxConstraints(minWidth: fullWidth ? double.infinity : 130),
+      padding: const EdgeInsets.all(15.0),
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(10.0), color: Theme.of(context).backgroundColor),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           icon,
           const SizedBox(
-            height: 10,
+            height: 5,
           ),
           PrimaryText(
             text: label,
             size: 14.0,
           ),
           const SizedBox(
-            height: 10,
+            height: 5,
           ),
           PrimaryText(
             text: '$prefixAmount${amount.toStringAsFixed(round)}$suffixAmount',
