@@ -17,10 +17,10 @@ import 'package:retrofit/http.dart';
 part 'api.g.dart';
 
 class AppUrl {
-  static const String liveBaseURL = "https://remote-ur/api/v1";
+  static const String liveBaseURL = "https://note.smbpunt.fr/api";
   static const String localBaseURL = "http://127.0.0.1:8000/api";
 
-  static const String baseURL = localBaseURL;
+  static const String baseURL = liveBaseURL;
   static const String login = "$baseURL/login_check";
   static const String refresh = "$baseURL/token/refresh";
   static const String register = "$baseURL/users";

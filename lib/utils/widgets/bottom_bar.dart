@@ -1,5 +1,6 @@
 import 'package:badges/badges.dart';
 import 'package:cryptobook/view/dashboard_screen.dart';
+import 'package:cryptobook/view/farmings/farmings_screen.dart';
 import 'package:cryptobook/view/positions/positions_screen.dart';
 import 'package:cryptobook/view/settings_screen.dart';
 import 'package:flutter/material.dart';
@@ -34,7 +35,11 @@ class BottomBarState extends State<BottomBar> {
         Navigator.of(context).pushAndRemoveUntil(
             PageRouteBuilder(pageBuilder: (context, a1, a2) => const PositionsScreen()), (route) => route.isFirst);
       }),
-      MenuItem(2, Icons.settings_outlined, Icons.settings, "Paramètres", () {
+      MenuItem(2, Icons.agriculture_outlined, Icons.agriculture, "Farmings", () {
+        Navigator.of(context).pushAndRemoveUntil(
+            PageRouteBuilder(pageBuilder: (context, a1, a2) => const FarmingsScreen()), (route) => route.isFirst);
+      }),
+      MenuItem(3, Icons.settings_outlined, Icons.settings, "Paramètres", () {
         Navigator.of(context).pushAndRemoveUntil(
             PageRouteBuilder(pageBuilder: (context, a1, a2) => const SettingsScreen()), (route) => route.isFirst);
       })
