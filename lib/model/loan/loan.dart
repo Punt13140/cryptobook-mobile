@@ -1,4 +1,4 @@
-import 'package:cryptobook/model/cryptocurrency.dart';
+import 'package:cryptobook/model/cryptocurrency/cryptocurrency.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'loan.g.dart';
@@ -10,7 +10,7 @@ class Loan {
   final double nbCoins;
   //final Dapp dapp;
   final String description;
-  final DateTime loanedAt;
+  final DateTime? loanedAt;
   final double currentValue;
 
   Loan(this.id, this.coin, this.nbCoins, this.description, this.loanedAt, this.currentValue);

@@ -1,4 +1,4 @@
-import 'package:cryptobook/model/cryptocurrency.dart';
+import 'package:cryptobook/model/cryptocurrency/cryptocurrency.dart';
 import 'package:cryptobook/model/position/position.dart';
 import 'package:cryptobook/utils/api.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,8 +16,11 @@ class PositionsBlocState {
   final Map<Cryptocurrency, Map<String, dynamic>> groupedPosStableOpened;
   final Map<Cryptocurrency, Map<String, dynamic>> groupedPosClosed;
 
-  PositionsBlocState(
-      {required this.groupedPosCryptoOpened, required this.groupedPosStableOpened, required this.groupedPosClosed});
+  PositionsBlocState({
+    required this.groupedPosCryptoOpened,
+    required this.groupedPosStableOpened,
+    required this.groupedPosClosed,
+  });
 
   const PositionsBlocState.initial()
       : groupedPosCryptoOpened = const {},

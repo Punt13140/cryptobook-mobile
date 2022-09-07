@@ -1,7 +1,8 @@
 import 'package:badges/badges.dart';
-import 'package:cryptobook/blocs/bloc_positions.dart';
-import 'package:cryptobook/model/cryptocurrency.dart';
+import 'package:cryptobook/blocs/position/bloc_positions.dart';
+import 'package:cryptobook/model/cryptocurrency/cryptocurrency.dart';
 import 'package:cryptobook/model/position/position.dart';
+import 'package:cryptobook/utils/util.dart';
 import 'package:cryptobook/utils/widgets/bottom_bar.dart';
 import 'package:cryptobook/view/positions/positions_coin_screen.dart';
 import 'package:flutter/material.dart';
@@ -15,32 +16,35 @@ class PositionsScreen extends StatelessWidget {
     return DefaultTabController(
       length: 3,
       child: Scaffold(
-          appBar: AppBar(
-              automaticallyImplyLeading: false,
-              title: const Text('Positions'),
-              bottom: const TabBar(tabs: [
-                Tab(icon: Icon(Icons.currency_bitcoin)),
-                Tab(icon: Icon(Icons.euro_symbol)),
-                Tab(icon: Icon(Icons.money_off)),
-              ])),
-          body: BlocProvider<PositionsBloc>(
-            create: (_) => PositionsBloc(),
-            child: const TabBarView(
-              children: [
-                CryptoOpenedWidget(),
-                StableOpenedWidget(),
-                ClosedWidget(),
-              ],
-            ),
+        appBar: AppBar(
+            automaticallyImplyLeading: false,
+            title: const Text('Positions'),
+            bottom: const TabBar(tabs: [
+              Tab(icon: Icon(Icons.currency_bitcoin)),
+              Tab(icon: Icon(Icons.euro_symbol)),
+              Tab(icon: Icon(Icons.money_off)),
+            ])),
+        body: BlocProvider<PositionsBloc>(
+          create: (_) => PositionsBloc(),
+          child: const TabBarView(
+            children: [
+              CryptoOpenedWidget(),
+              StableOpenedWidget(),
+              ClosedWidget(),
+            ],
           ),
-          bottomNavigationBar: const BottomBar(
-            position: 1,
-          ),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () {},
-            tooltip: 'Ajouter une position',
-            child: const Icon(Icons.add),
-          )),
+        ),
+        bottomNavigationBar: const BottomBar(
+          position: 1,
+        ),
+        // floatingActionButton: FloatingActionButton(
+        //   onPressed: () {
+        //     Navigator.pushNamed(context, '/position-form');
+        //   },
+        //   tooltip: 'Ajouter une position',
+        //   child: const Icon(Icons.add),
+        // ),
+      ),
     );
   }
 }
@@ -119,6 +123,7 @@ class ListViewPositionsGrouped extends StatelessWidget {
         itemBuilder: (BuildContext context, int index) {
           Cryptocurrency coin = positions.keys.elementAt(index);
           double value = coin.priceUsd * positions[coin]!['nbTotal'];
+          String totalCoinFormated = nbCoinsFormated(positions[coin]!['nbTotal']);
 
           return Card(
             child: ListTile(
@@ -144,8 +149,8 @@ class ListViewPositionsGrouped extends StatelessWidget {
                   backgroundImage: NetworkImage(coin.urlImgThumb),
                 ),
               ),
-              title: Text('${positions[coin]!['nbTotal'].toStringAsFixed(4)} ${coin.symbol.toUpperCase()}'),
-              subtitle: Text('~ \$${value.toStringAsFixed(0)}'),
+              title: Text('$totalCoinFormated ${coin.symbol.toUpperCase()}'),
+              subtitle: Text('~ \$${value.toInt().toString()}'),
               trailing: const Icon(Icons.arrow_right),
             ),
           );

@@ -1,11 +1,11 @@
-import 'package:cryptobook/model/cryptocurrency.dart';
+import 'package:cryptobook/model/cryptocurrency/cryptocurrency.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'position.g.dart';
 
 @JsonSerializable()
 class Position {
-  final int id;
+  final int? id;
   final double nbCoins;
   final Cryptocurrency coin;
   final bool isOpened;

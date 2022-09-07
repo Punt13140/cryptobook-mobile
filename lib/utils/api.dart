@@ -1,3 +1,5 @@
+import 'package:cryptobook/model/cryptocurrency/api_response_cryptocurrency.dart';
+import 'package:cryptobook/model/cryptocurrency/cryptocurrency.dart';
 import 'package:cryptobook/model/deposit/api_response_deposit.dart';
 import 'package:cryptobook/model/deposit/deposit.dart';
 import 'package:cryptobook/model/farming/lp/api_response_farming_lp.dart';
@@ -17,12 +19,12 @@ import 'package:retrofit/http.dart';
 part 'api.g.dart';
 
 class AppUrl {
-  static const String liveBaseURL = "https://note.smbpunt.fr/api";
-  static const String localBaseURL = "http://127.0.0.1:8000/api";
+  static const String liveBaseURL = "https://cryptobook.smbpunt.fr";
+  static const String localBaseURL = "http://127.0.0.1:8000";
 
-  static const String baseURL = liveBaseURL;
-  static const String login = "$baseURL/login_check";
-  static const String refresh = "$baseURL/token/refresh";
+  static const String baseURL = "$liveBaseURL/api";
+  static const String login = "/login_check";
+  static const String refresh = "/token/refresh";
   static const String register = "$baseURL/users";
   static const String positions = "$baseURL/positions";
 }
@@ -36,6 +38,9 @@ abstract class RestClient {
 
   @POST("/login_check")
   Future<UserAuth?> getUserAuth(@Body() Map<String, dynamic> map);
+
+  @POST("/token/refresh")
+  Future<UserAuth?> getRefreshUserAuth(@Body() Map<String, dynamic> map);
 
   @GET("/positions")
   Future<PositionList> getPositions();
@@ -51,6 +56,12 @@ abstract class RestClient {
 
   @GET("/strategy_lps")
   Future<FarmingLpList> getLpFarmings();
+
+  @GET("/cryptocurrencies")
+  Future<CryptocurrencyList> getCryptocurrencies();
+
+  @GET("/cryptocurrencies/{id}")
+  Future<Cryptocurrency> getCryptocurrency(@Path("id") int id);
 }
 
 class NetworkManager {
@@ -75,22 +86,26 @@ class NetworkManager {
 
     dio.interceptors.add(InterceptorsWrapper(onRequest: (options, handler) async {
       UserAuth? user = await Storage().getUser();
-      if (user != null) {
-        // debugPrint("intercept api > ${options.path} > token: ${user.token}");
+      if (user != null && options.path != AppUrl.login && options.path != AppUrl.refresh) {
+        //debugPrint("intercept api > ${options.path} > token: ${user.token}");
         if (!options.path.contains('http')) {
           options.path = AppUrl.baseURL + options.path;
         }
         options.headers['Authorization'] = 'Bearer ${user.token}';
-        return handler.next(options);
       }
+      return handler.next(options);
     }, onError: (DioError error, handler) async {
+      debugPrint('error ${error.response?.toString()}');
+
       if ((error.response?.data['code'] == 401 && error.response?.data['message'] == "Expired JWT Token")) {
-        // String? localRefreshToken = await _storage.getRefreshToken();
-        // if (localRefreshToken != null) {
-        //   if (await refreshToken(localRefreshToken)) {
-        //     return handler.resolve(await _retry(error.requestOptions));
-        //   }
-        // }
+        UserAuth? user = await Storage().getUser();
+        if (user == null) {
+          return;
+        }
+        String? localRefreshToken = user.refreshToken;
+        if (await refreshToken(localRefreshToken)) {
+          return handler.resolve(await _retry(error.requestOptions));
+        }
       }
       return handler.next(error);
     }));
@@ -98,24 +113,44 @@ class NetworkManager {
     api = RestClient(dio);
   }
 
+  Future<Response<dynamic>> _retry(RequestOptions requestOptions) async {
+    final options = Options(
+      method: requestOptions.method,
+      headers: requestOptions.headers,
+    );
+    return dio.request<dynamic>(requestOptions.path,
+        data: requestOptions.data, queryParameters: requestOptions.queryParameters, options: options);
+  }
+
+  Future<bool> refreshToken(String refreshToken) async {
+    UserAuth? user = await api.getRefreshUserAuth({
+      'refresh_token': refreshToken,
+    }).onError((error, stackTrace) {
+      debugPrint('Error refresh : ${error.toString()} ///');
+      return null;
+    }).then((value) {
+      return value;
+    });
+
+    if (user != null) {
+      Storage().saveUserAuth(user);
+      return true;
+    }
+
+    return false;
+  }
+
   Future<UserAuth?> getUserAuth(String email, String password) async {
-    print('username: $email, password: $password');
     UserAuth? user = await api.getUserAuth({
       'username': email,
       'password': password,
     }).onError((error, stackTrace) {
-      debugPrint('---> ${error.toString()} ///');
+      debugPrint('Auth failed.');
+      debugPrint('Error : ${error.toString()} ///');
       return null;
     }).then((value) {
-      debugPrint('---> ${value.toString()} ///');
       return value;
     });
-
-    await Future.delayed(const Duration(seconds: 1));
-
-    if (user != null) {
-      Storage().saveUserAuth(user);
-    }
 
     return user;
   }
@@ -143,5 +178,14 @@ class NetworkManager {
   Future<List<FarmingLp>> getLpFarmings() async {
     FarmingLpList response = await api.getLpFarmings();
     return response.lstObjects;
+  }
+
+  Future<List<Cryptocurrency>> getCryptocurrencies() async {
+    CryptocurrencyList response = await api.getCryptocurrencies();
+    return response.lstObjects;
+  }
+
+  Future<Cryptocurrency> getCryptocurrency(int id) async {
+    return await api.getCryptocurrency(id);
   }
 }

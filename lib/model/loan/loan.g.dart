@@ -11,7 +11,9 @@ Loan _$LoanFromJson(Map<String, dynamic> json) => Loan(
       Cryptocurrency.fromJson(json['coin'] as Map<String, dynamic>),
       (json['nbCoins'] as num).toDouble(),
       json['description'] as String,
-      DateTime.parse(json['loanedAt'] as String),
+      json['loanedAt'] == null
+          ? null
+          : DateTime.parse(json['loanedAt'] as String),
       (json['currentValue'] as num).toDouble(),
     );
 
@@ -20,6 +22,6 @@ Map<String, dynamic> _$LoanToJson(Loan instance) => <String, dynamic>{
       'coin': instance.coin,
       'nbCoins': instance.nbCoins,
       'description': instance.description,
-      'loanedAt': instance.loanedAt.toIso8601String(),
+      'loanedAt': instance.loanedAt?.toIso8601String(),
       'currentValue': instance.currentValue,
     };

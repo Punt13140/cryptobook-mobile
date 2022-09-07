@@ -8,7 +8,7 @@ class Deposit {
   final DateTime depositedAt;
   //final TypeDeposit type;
   //final Exchange exchange;
-  final int valueEur;
+  final double valueEur;
 
   Deposit(this.id, this.depositedAt, this.valueEur);
 

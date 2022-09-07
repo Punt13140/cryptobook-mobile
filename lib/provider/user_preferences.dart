@@ -7,17 +7,16 @@ class UserPreferences extends ChangeNotifier {
   final SharedPreferences _sharedPreferences;
 
   static Future<UserPreferences> getUserPreferences() async {
-    debugPrint('ici');
     final SharedPreferences preferences = await SharedPreferences.getInstance();
     return UserPreferences._shared(preferences);
   }
 
-  static const String _KEY_DARK_THEME = 'isDarkTheme';
+  static const String keyDarkTheme = 'isDarkTheme';
 
   Future<void> setDarkTheme(final bool isDarkTheme) async {
-    await _sharedPreferences.setBool(_KEY_DARK_THEME, isDarkTheme);
+    await _sharedPreferences.setBool(keyDarkTheme, isDarkTheme);
     notifyListeners();
   }
 
-  bool get isDarkTheme => _sharedPreferences.getBool(_KEY_DARK_THEME) ?? true;
+  bool get isDarkTheme => _sharedPreferences.getBool(keyDarkTheme) ?? true;
 }

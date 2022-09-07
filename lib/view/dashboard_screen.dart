@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:cryptobook/blocs/bloc_dashboard.dart';
-import 'package:cryptobook/model/cryptocurrency.dart';
+import 'package:cryptobook/model/cryptocurrency/cryptocurrency.dart';
 import 'package:cryptobook/model/position/position.dart';
 import 'package:cryptobook/utils/widgets/bottom_bar.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -105,21 +105,20 @@ class CoinChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<DashboardBloc, DashboardBlocState>(
-      buildWhen: (oldState, newState) => oldState.positions.isEmpty,
+      buildWhen: (oldState, newState) => oldState.mapChartCrypto == null,
       builder: (_, DashboardBlocState state) {
-        if (state.positions.isNotEmpty && state.mapChartCrypto.isNotEmpty) {
-          return PieChart(
-            PieChartData(
-              pieTouchData: PieTouchData(),
-              borderData: FlBorderData(show: false, border: Border.all(color: Colors.red)),
-              sectionsSpace: 0,
-              centerSpaceRadius: 0,
-              sections: showingSections(state.mapChartCrypto, state.crypto),
-            ),
-          );
-        } else {
+        if (state.mapChartCrypto == null || state.crypto == null) {
           return const Center(child: CircularProgressIndicator.adaptive());
         }
+        return PieChart(
+          PieChartData(
+            pieTouchData: PieTouchData(),
+            borderData: FlBorderData(show: false, border: Border.all(color: Colors.red)),
+            sectionsSpace: 0,
+            centerSpaceRadius: 0,
+            sections: showingSections(state.mapChartCrypto!, state.crypto!),
+          ),
+        );
       },
     );
   }
@@ -138,7 +137,7 @@ class CoinChart extends StatelessWidget {
           badgeWidget: _Badge(
             key.urlImgThumb,
             borderColor: Colors.black,
-            size: 40,
+            size: 25,
           ),
           badgePositionPercentageOffset: .90);
       lst.add(data);
@@ -153,21 +152,21 @@ class StableChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<DashboardBloc, DashboardBlocState>(
-      buildWhen: (oldState, newState) => oldState.positions.isEmpty,
+      buildWhen: (oldState, newState) => oldState.mapChartStable == null,
       builder: (_, DashboardBlocState state) {
-        if (state.positions.isNotEmpty && state.mapChartCrypto.isNotEmpty) {
-          return PieChart(
-            PieChartData(
-              pieTouchData: PieTouchData(),
-              borderData: FlBorderData(show: false, border: Border.all(color: Colors.red)),
-              sectionsSpace: 0,
-              centerSpaceRadius: 0,
-              sections: showingSections(state.mapChartStable, state.stable),
-            ),
-          );
-        } else {
+        if (state.mapChartStable == null || state.stable == null) {
           return const Center(child: CircularProgressIndicator.adaptive());
         }
+
+        return PieChart(
+          PieChartData(
+            pieTouchData: PieTouchData(),
+            borderData: FlBorderData(show: false, border: Border.all(color: Colors.red)),
+            sectionsSpace: 0,
+            centerSpaceRadius: 0,
+            sections: showingSections(state.mapChartStable!, state.stable!),
+          ),
+        );
       },
     );
   }
@@ -201,37 +200,37 @@ class DiffStableCryptoChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<DashboardBloc, DashboardBlocState>(
-      buildWhen: (oldState, newState) => oldState.positions.isEmpty,
+      buildWhen: (oldState, newState) => oldState.total == null,
       builder: (_, DashboardBlocState state) {
-        if (state.positions.isNotEmpty && state.mapChartCrypto.isNotEmpty) {
-          double percentStable = state.stable * 100 / state.total;
-          double percentCrypto = state.crypto * 100 / state.total;
-
-          return PieChart(
-            PieChartData(
-              pieTouchData: PieTouchData(),
-              borderData: FlBorderData(show: false, border: Border.all(color: Colors.red)),
-              sectionsSpace: 0,
-              centerSpaceRadius: 0,
-              sections: [
-                PieChartSectionData(
-                  value: percentStable,
-                  title: '${percentStable.round()} % stable',
-                  radius: 150,
-                  color: Colors.blueGrey,
-                ),
-                PieChartSectionData(
-                  value: percentCrypto,
-                  title: '${percentCrypto.round()} % crypto',
-                  radius: 150,
-                  color: Colors.deepOrangeAccent,
-                )
-              ],
-            ),
-          );
-        } else {
+        if (state.total == null || state.stable == null || state.crypto == null) {
           return const Center(child: CircularProgressIndicator.adaptive());
         }
+
+        double percentStable = state.stable! * 100 / state.total!;
+        double percentCrypto = state.crypto! * 100 / state.total!;
+
+        return PieChart(
+          PieChartData(
+            pieTouchData: PieTouchData(),
+            borderData: FlBorderData(show: false, border: Border.all(color: Colors.red)),
+            sectionsSpace: 0,
+            centerSpaceRadius: 0,
+            sections: [
+              PieChartSectionData(
+                value: percentStable,
+                title: '${percentStable.round()} % stable',
+                radius: 150,
+                color: Colors.blueGrey,
+              ),
+              PieChartSectionData(
+                value: percentCrypto,
+                title: '${percentCrypto.round()} % crypto',
+                radius: 150,
+                color: Colors.deepOrangeAccent,
+              )
+            ],
+          ),
+        );
       },
     );
   }
@@ -283,66 +282,101 @@ class PositionsContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<DashboardBloc, DashboardBlocState>(
-      buildWhen: (oldState, newState) => oldState.positions.isEmpty,
-      builder: (_, DashboardBlocState state) {
-        if (state.positions.isNotEmpty) {
-          return SizedBox(
-            width: MediaQuery.of(context).size.width,
-            child: Wrap(
-              runSpacing: 15,
-              spacing: 10,
-              alignment: WrapAlignment.spaceBetween,
-              children: [
-                InfoCard(
-                  icon: const Icon(Icons.account_balance_wallet),
-                  label: 'Total',
-                  amount: state.total,
-                  fullWidth: true,
-                ),
-                InfoCard(
-                  icon: const Icon(Icons.currency_bitcoin),
-                  label: 'Crypto',
-                  amount: state.crypto,
-                ),
-                InfoCard(
-                  icon: const Icon(Icons.attach_money),
-                  label: 'Stable',
-                  amount: state.stable,
-                ),
-                InfoCard(
-                  icon: const Icon(Icons.savings),
-                  label: 'Invested',
-                  amount: state.invested,
-                  round: 0,
-                ),
-                InfoCard(
-                  icon: const Icon(Icons.real_estate_agent),
-                  label: 'Loan',
-                  amount: state.loan,
-                  round: 0,
-                ),
-                InfoCard(
-                  icon: const Icon(Icons.price_change),
-                  label: 'Win/Lose',
-                  amount: state.percentWinLose.toDouble(),
-                  prefixAmount: state.percentWinLose > 0 ? '+' : '-',
-                  suffixAmount: '%',
-                  round: 0,
-                  colorAmount: true,
-                ),
-                InfoCard(
-                  icon: const Icon(Icons.price_change),
-                  label: 'Farming 1Y',
-                  amount: state.annualFarming,
-                ),
-              ],
-            ),
-          );
-        } else {
-          return const Center(child: CircularProgressIndicator.adaptive());
-        }
-      },
+    return SizedBox(
+      width: MediaQuery.of(context).size.width,
+      child: Wrap(
+        runSpacing: 15,
+        spacing: 10,
+        alignment: WrapAlignment.spaceBetween,
+        children: [
+          BlocBuilder<DashboardBloc, DashboardBlocState>(
+            buildWhen: (oldState, newState) => oldState.total == null || oldState.total != newState.total,
+            builder: (_, DashboardBlocState state) {
+              return InfoCard(
+                icon: const Icon(Icons.account_balance_wallet),
+                label: 'Total',
+                amount: state.total,
+                fullWidth: true,
+                isLoading: state.total == null,
+              );
+            },
+          ),
+          BlocBuilder<DashboardBloc, DashboardBlocState>(
+            buildWhen: (oldState, newState) => oldState.crypto == null || oldState.crypto != newState.crypto,
+            builder: (_, DashboardBlocState state) {
+              return InfoCard(
+                icon: const Icon(Icons.currency_bitcoin),
+                label: 'Crypto',
+                amount: state.crypto,
+                isLoading: state.crypto == null,
+              );
+            },
+          ),
+          BlocBuilder<DashboardBloc, DashboardBlocState>(
+            buildWhen: (oldState, newState) => oldState.stable == null || oldState.stable != newState.stable,
+            builder: (_, DashboardBlocState state) {
+              return InfoCard(
+                icon: const Icon(Icons.attach_money),
+                label: 'Stable',
+                amount: state.stable,
+                isLoading: state.stable == null,
+              );
+            },
+          ),
+          BlocBuilder<DashboardBloc, DashboardBlocState>(
+            buildWhen: (oldState, newState) => oldState.invested == null || oldState.invested != newState.invested,
+            builder: (_, DashboardBlocState state) {
+              return InfoCard(
+                icon: const Icon(Icons.savings),
+                label: 'Invested',
+                amount: state.invested,
+                round: 0,
+                isLoading: state.invested == null,
+              );
+            },
+          ),
+          BlocBuilder<DashboardBloc, DashboardBlocState>(
+            buildWhen: (oldState, newState) => oldState.loan == null || oldState.loan != newState.loan,
+            builder: (_, DashboardBlocState state) {
+              return InfoCard(
+                icon: const Icon(Icons.real_estate_agent),
+                label: 'Loan',
+                amount: state.loan,
+                round: 0,
+                isLoading: state.loan == null,
+              );
+            },
+          ),
+          BlocBuilder<DashboardBloc, DashboardBlocState>(
+            buildWhen: (oldState, newState) =>
+                oldState.percentWinLose == null || oldState.percentWinLose != newState.percentWinLose,
+            builder: (_, DashboardBlocState state) {
+              return InfoCard(
+                icon: const Icon(Icons.price_change),
+                label: 'Win/Lose',
+                amount: state.percentWinLose?.toDouble(),
+                prefixAmount: state.percentWinLose != null ? (state.percentWinLose! > 0 ? '+' : '-') : '',
+                suffixAmount: '%',
+                round: 0,
+                colorAmount: true,
+                isLoading: state.percentWinLose == null,
+              );
+            },
+          ),
+          BlocBuilder<DashboardBloc, DashboardBlocState>(
+            buildWhen: (oldState, newState) =>
+                oldState.annualFarming == null || oldState.annualFarming != newState.annualFarming,
+            builder: (_, DashboardBlocState state) {
+              return InfoCard(
+                icon: const Icon(Icons.price_change),
+                label: 'Farming 1M',
+                amount: state.annualFarming,
+                isLoading: state.annualFarming == null,
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
 }
@@ -365,25 +399,28 @@ class ListPosition extends StatelessWidget {
 }
 
 class InfoCard extends StatelessWidget {
-  const InfoCard({
-    Key? key,
-    required this.icon,
-    required this.label,
-    required this.amount,
-    this.colorAmount = false,
-    this.prefixAmount = "\$",
-    this.suffixAmount = "",
-    this.round = 2,
-    this.fullWidth = false,
-  }) : super(key: key);
+  const InfoCard(
+      {Key? key,
+      required this.icon,
+      required this.label,
+      required this.amount,
+      this.colorAmount = false,
+      this.prefixAmount = "\$",
+      this.suffixAmount = "",
+      this.round = 2,
+      this.fullWidth = false,
+      this.isLoading = true})
+      : super(key: key);
+
   final Icon icon;
   final String label;
   final String prefixAmount;
-  final double amount;
+  final double? amount;
   final String suffixAmount;
   final int round;
   final bool colorAmount;
   final bool fullWidth;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
@@ -399,19 +436,25 @@ class InfoCard extends StatelessWidget {
             height: 5,
           ),
           PrimaryText(
-            text: label,
+            overrideText: label,
             size: 14.0,
           ),
           const SizedBox(
             height: 5,
           ),
-          PrimaryText(
-            text: '$prefixAmount${amount.toStringAsFixed(round)}$suffixAmount',
-            size: 16,
-            fontWeight: FontWeight.w800,
-            color:
-                colorAmount ? (amount > 0.0 ? Colors.green : Colors.red) : Theme.of(context).textTheme.bodyText1?.color,
-          ),
+          !isLoading
+              ? PrimaryText(
+                  prefixAmount: prefixAmount,
+                  amount: amount,
+                  round: round,
+                  suffixAmount: suffixAmount,
+                  size: 16,
+                  fontWeight: FontWeight.w800,
+                  color: (amount != null && colorAmount)
+                      ? (amount! > 0.0 ? Colors.green : Colors.red)
+                      : Theme.of(context).textTheme.bodyText1?.color,
+                )
+              : const CircularProgressIndicator.adaptive(),
         ],
       ),
     );
@@ -422,12 +465,22 @@ class PrimaryText extends StatelessWidget {
   final double size;
   final FontWeight fontWeight;
   final Color? color;
-  final String text;
+
+  final String? overrideText;
+  final String prefixAmount;
+  final String suffixAmount;
+  final double? amount;
+  final int round;
+
   final double height;
 
   const PrimaryText({
     Key? key,
-    required this.text,
+    this.prefixAmount = "\$",
+    this.suffixAmount = "",
+    this.round = 2,
+    this.amount,
+    this.overrideText,
     this.fontWeight = FontWeight.w400,
     this.color,
     this.size = 20,
@@ -436,6 +489,9 @@ class PrimaryText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String text =
+        overrideText ?? (amount != null ? '$prefixAmount${amount!.toStringAsFixed(round)}$suffixAmount' : 'Erreur');
+
     return Text(
       text,
       style: TextStyle(

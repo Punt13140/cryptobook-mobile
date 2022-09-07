@@ -31,7 +31,7 @@ class SettingsScreen extends StatelessWidget {
           },
         ),
         bottomNavigationBar: const BottomBar(
-          position: 2,
+          position: 3,
         ),
       ),
     );
@@ -141,7 +141,7 @@ class _ButtonsContentState extends State<ButtonsContent> {
                 onTap: () async {
                   await _handleDisconnect();
                   if (mounted) {
-                    Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+                    Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
                   }
                 },
               );

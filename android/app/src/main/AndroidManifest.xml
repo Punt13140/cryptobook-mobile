@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="fr.smb.punt.cryptobook">
+    package="fr.smb.cryptobook">
    <application
         android:label="cryptobook"
         android:name="${applicationName}"
@@ -31,4 +31,5 @@
             android:name="flutterEmbedding"
             android:value="2" />
     </application>
+    <uses-permission android:name="android.permission.INTERNET"/>
 </manifest>

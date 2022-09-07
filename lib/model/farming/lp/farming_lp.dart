@@ -1,4 +1,4 @@
-import 'package:cryptobook/model/cryptocurrency.dart';
+import 'package:cryptobook/model/cryptocurrency/cryptocurrency.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'farming_lp.g.dart';

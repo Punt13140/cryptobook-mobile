@@ -1,8 +1,8 @@
 import 'package:cryptobook/blocs/bloc_farmings.dart';
-import 'package:cryptobook/model/cryptocurrency.dart';
+import 'package:cryptobook/model/cryptocurrency/cryptocurrency.dart';
 import 'package:cryptobook/model/farming/lp/farming_lp.dart';
 import 'package:cryptobook/model/farming/simple/farming_simple.dart';
-import 'package:cryptobook/utils/actions_list.dart';
+import 'package:cryptobook/utils/util.dart';
 import 'package:cryptobook/utils/widgets/bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -15,32 +15,33 @@ class FarmingsScreen extends StatelessWidget {
     return DefaultTabController(
       length: 3,
       child: Scaffold(
-          appBar: AppBar(
-              automaticallyImplyLeading: false,
-              title: const Text('Farmings'),
-              bottom: const TabBar(tabs: [
-                Tab(icon: Icon(Icons.currency_bitcoin)),
-                Tab(icon: Icon(Icons.euro_symbol)),
-                Tab(icon: Icon(Icons.spoke)),
-              ])),
-          body: BlocProvider<FarmingsBloc>(
-            create: (_) => FarmingsBloc(),
-            child: const TabBarView(
-              children: [
-                SimpleFarmingContent(),
-                StableFarmingContent(),
-                LpFarmingContent(),
-              ],
-            ),
+        appBar: AppBar(
+            automaticallyImplyLeading: false,
+            title: const Text('Farmings'),
+            bottom: const TabBar(tabs: [
+              Tab(icon: Icon(Icons.currency_bitcoin)),
+              Tab(icon: Icon(Icons.euro_symbol)),
+              Tab(icon: Icon(Icons.spoke)),
+            ])),
+        body: BlocProvider<FarmingsBloc>(
+          create: (_) => FarmingsBloc(),
+          child: const TabBarView(
+            children: [
+              SimpleFarmingContent(),
+              StableFarmingContent(),
+              LpFarmingContent(),
+            ],
           ),
-          bottomNavigationBar: const BottomBar(
-            position: 2,
-          ),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () {},
-            tooltip: 'Ajouter une position',
-            child: const Icon(Icons.add),
-          )),
+        ),
+        bottomNavigationBar: const BottomBar(
+          position: 2,
+        ),
+        // floatingActionButton: FloatingActionButton(
+        //   onPressed: () {},
+        //   tooltip: 'Ajouter une position',
+        //   child: const Icon(Icons.add),
+        // ),
+      ),
     );
   }
 }
@@ -154,37 +155,30 @@ class ListViewSimpleFarmings extends StatelessWidget {
         itemBuilder: (BuildContext context, int index) {
           return Card(
             child: ListTile(
-              onTap: () async {
-                // showDialog(
-                //     context: context,
-                //     builder: (context) {
-                //       return PositionDialogContent(position: farmings[index]);
-                //     });
-              },
               leading: CircleAvatar(
                 radius: 16,
                 backgroundColor: Colors.white,
                 backgroundImage: NetworkImage(farmings[index].coin.urlImgThumb),
               ),
-              title: Text('${farmings[index].nbCoins.toStringAsFixed(4)} ${farmings[index].coin.symbol.toUpperCase()}'),
+              title: Text('${nbCoinsFormated(farmings[index].nbCoins)} ${farmings[index].coin.symbol.toUpperCase()}'),
               subtitle: Text('~ \$${farmings[index].annualRewards.toStringAsFixed(2)}/Y'),
-              trailing: PopupMenuButton(
-                icon: const Icon(Icons.more_vert),
-                itemBuilder: (context) => [
-                  const PopupMenuItem(
-                    value: ActionsList.actionEdit,
-                    child: Text("Modifier"),
-                  ),
-                  const PopupMenuItem(
-                    value: ActionsList.actionClose,
-                    child: Text("Fermer la position"),
-                  ),
-                  const PopupMenuItem(
-                    value: ActionsList.actionDelete,
-                    child: Text("Supprimer la position"),
-                  )
-                ],
-              ),
+              // trailing: PopupMenuButton(
+              //   icon: const Icon(Icons.more_vert),
+              //   itemBuilder: (context) => [
+              //     const PopupMenuItem(
+              //       value: ActionsList.actionEdit,
+              //       child: Text("Modifier"),
+              //     ),
+              //     const PopupMenuItem(
+              //       value: ActionsList.actionClose,
+              //       child: Text("Fermer la position"),
+              //     ),
+              //     const PopupMenuItem(
+              //       value: ActionsList.actionDelete,
+              //       child: Text("Supprimer la position"),
+              //     )
+              //   ],
+              // ),
             ),
           );
         },
@@ -207,34 +201,27 @@ class ListViewLpFarmings extends StatelessWidget {
         itemBuilder: (BuildContext context, int index) {
           return Card(
             child: ListTile(
-              onTap: () async {
-                // showDialog(
-                //     context: context,
-                //     builder: (context) {
-                //       return PositionDialogContent(position: farmings[index]);
-                //     });
-              },
               leading: LpStackIcon(coin1: farmings[index].coin1, coin2: farmings[index].coin2),
-              title:
-                  Text('${farmings[index].nbCoin1.toStringAsFixed(4)}/${farmings[index].nbCoin2.toStringAsFixed(4)}'),
+              title: Text(
+                  '${nbCoinsFormated(farmings[index].nbCoin1)}/${nbCoinsFormated(farmings[index].nbCoin2)} ${farmings[index].coin1.symbol.toUpperCase()}/${farmings[index].coin2.symbol.toUpperCase()}'),
               subtitle: Text('~ \$${farmings[index].annualRewards.toStringAsFixed(2)}/Y'),
-              trailing: PopupMenuButton(
-                icon: const Icon(Icons.more_vert),
-                itemBuilder: (context) => [
-                  const PopupMenuItem(
-                    value: ActionsList.actionEdit,
-                    child: Text("Modifier"),
-                  ),
-                  const PopupMenuItem(
-                    value: ActionsList.actionClose,
-                    child: Text("Fermer la position"),
-                  ),
-                  const PopupMenuItem(
-                    value: ActionsList.actionDelete,
-                    child: Text("Supprimer la position"),
-                  )
-                ],
-              ),
+              // trailing: PopupMenuButton(
+              //   icon: const Icon(Icons.more_vert),
+              //   itemBuilder: (context) => [
+              //     const PopupMenuItem(
+              //       value: ActionsList.actionEdit,
+              //       child: Text("Modifier"),
+              //     ),
+              //     const PopupMenuItem(
+              //       value: ActionsList.actionClose,
+              //       child: Text("Fermer la position"),
+              //     ),
+              //     const PopupMenuItem(
+              //       value: ActionsList.actionDelete,
+              //       child: Text("Supprimer la position"),
+              //     )
+              //   ],
+              // ),
             ),
           );
         },

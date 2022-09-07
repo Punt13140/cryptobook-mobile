@@ -9,7 +9,6 @@ class Storage {
   static const String _refreshToken = 'jwt_refresh_token';
 
   Future<void> saveUserAuth(UserAuth userAuth) async {
-    print('Sauvegarde de luser en storage');
     _storage.write(
       key: _token,
       value: userAuth.token,
@@ -43,7 +42,7 @@ class Storage {
       );
 
   AndroidOptions _getAndroidOptions() => const AndroidOptions(
-        encryptedSharedPreferences: true,
+      //encryptedSharedPreferences: true,
       );
 
   String? _getAccountName() => _accountNameController.text.isEmpty ? null : _accountNameController.text;

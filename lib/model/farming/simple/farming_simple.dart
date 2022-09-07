@@ -1,4 +1,4 @@
-import 'package:cryptobook/model/cryptocurrency.dart';
+import 'package:cryptobook/model/cryptocurrency/cryptocurrency.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'farming_simple.g.dart';
@@ -11,7 +11,7 @@ class FarmingSimple {
     required this.nbCoins,
     //this.dapp,
     required this.apr,
-    required this.enteredAt,
+    this.enteredAt,
     required this.description,
   });
 
@@ -20,7 +20,7 @@ class FarmingSimple {
   final double nbCoins;
   //final Dapp dapp;
   final double apr;
-  final DateTime enteredAt;
+  final DateTime? enteredAt;
   final String description;
 
   factory FarmingSimple.fromJson(Map<String, dynamic> json) => _$FarmingSimpleFromJson(json);

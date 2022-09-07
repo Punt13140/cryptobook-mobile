@@ -9,7 +9,7 @@ part of 'deposit.dart';
 Deposit _$DepositFromJson(Map<String, dynamic> json) => Deposit(
       json['id'] as int,
       DateTime.parse(json['depositedAt'] as String),
-      json['valueEur'] as int,
+      (json['valueEur'] as num).toDouble(),
     );
 
 Map<String, dynamic> _$DepositToJson(Deposit instance) => <String, dynamic>{

@@ -1,3 +1,4 @@
+import 'package:flutter_awesome_select/flutter_awesome_select.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'cryptocurrency.g.dart';
@@ -37,4 +38,8 @@ class Cryptocurrency {
 
   @override
   int get hashCode => id.hashCode;
+
+  static List<S2Choice<Cryptocurrency>> buildListChoice(List<Cryptocurrency> cryptocurrencies) {
+    return cryptocurrencies.map((e) => S2Choice<Cryptocurrency>(value: e, title: e.libelle)).toList();
+  }
 }

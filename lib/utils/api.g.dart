@@ -6,7 +6,7 @@ part of 'api.dart';
 // RetrofitGenerator
 // **************************************************************************
 
-// ignore_for_file: unnecessary_brace_in_string_interps
+// ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers
 
 class _RestClient implements RestClient {
   _RestClient(this._dio, {this.baseUrl});
@@ -26,6 +26,24 @@ class _RestClient implements RestClient {
         _setStreamType<UserAuth>(
             Options(method: 'POST', headers: _headers, extra: _extra)
                 .compose(_dio.options, '/login_check',
+                    queryParameters: queryParameters, data: _data)
+                .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    final value =
+        _result.data == null ? null : UserAuth.fromJson(_result.data!);
+    return value;
+  }
+
+  @override
+  Future<UserAuth?> getRefreshUserAuth(map) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    _data.addAll(map);
+    final _result = await _dio.fetch<Map<String, dynamic>?>(
+        _setStreamType<UserAuth>(
+            Options(method: 'POST', headers: _headers, extra: _extra)
+                .compose(_dio.options, '/token/refresh',
                     queryParameters: queryParameters, data: _data)
                 .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
     final value =
@@ -110,6 +128,38 @@ class _RestClient implements RestClient {
                     queryParameters: queryParameters, data: _data)
                 .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
     final value = FarmingLpList.fromJson(_result.data!);
+    return value;
+  }
+
+  @override
+  Future<CryptocurrencyList> getCryptocurrencies() async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    final _result = await _dio.fetch<Map<String, dynamic>>(
+        _setStreamType<CryptocurrencyList>(
+            Options(method: 'GET', headers: _headers, extra: _extra)
+                .compose(_dio.options, '/cryptocurrencies',
+                    queryParameters: queryParameters, data: _data)
+                .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    final value = CryptocurrencyList.fromJson(_result.data!);
+    return value;
+  }
+
+  @override
+  Future<Cryptocurrency> getCryptocurrency(id) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    final _result = await _dio.fetch<Map<String, dynamic>>(
+        _setStreamType<Cryptocurrency>(
+            Options(method: 'GET', headers: _headers, extra: _extra)
+                .compose(_dio.options, '/cryptocurrencies/${id}',
+                    queryParameters: queryParameters, data: _data)
+                .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    final value = Cryptocurrency.fromJson(_result.data!);
     return value;
   }
 

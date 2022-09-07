@@ -7,7 +7,7 @@ part of 'position.dart';
 // **************************************************************************
 
 Position _$PositionFromJson(Map<String, dynamic> json) => Position(
-      json['id'] as int,
+      json['id'] as int?,
       (json['nbCoins'] as num).toDouble(),
       Cryptocurrency.fromJson(json['coin'] as Map<String, dynamic>),
       json['isOpened'] as bool,

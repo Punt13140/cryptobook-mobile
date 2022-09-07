@@ -12,7 +12,9 @@ FarmingSimple _$FarmingSimpleFromJson(Map<String, dynamic> json) =>
       coin: Cryptocurrency.fromJson(json['coin'] as Map<String, dynamic>),
       nbCoins: (json['nbCoins'] as num).toDouble(),
       apr: (json['apr'] as num).toDouble(),
-      enteredAt: DateTime.parse(json['enteredAt'] as String),
+      enteredAt: json['enteredAt'] == null
+          ? null
+          : DateTime.parse(json['enteredAt'] as String),
       description: json['description'] as String,
     );
 
@@ -22,6 +24,6 @@ Map<String, dynamic> _$FarmingSimpleToJson(FarmingSimple instance) =>
       'coin': instance.coin,
       'nbCoins': instance.nbCoins,
       'apr': instance.apr,
-      'enteredAt': instance.enteredAt.toIso8601String(),
+      'enteredAt': instance.enteredAt?.toIso8601String(),
       'description': instance.description,
     };
