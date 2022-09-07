@@ -86,7 +86,6 @@ class DashboardBloc extends Bloc<DashboardBlocEvent, DashboardBlocState> {
 
   void loadDashboard(LoadDashboardEvent event, Emitter<DashboardBlocState> emit) async {
     emit(state.copyWith(status: ViewStatus.loading));
-    await Future.delayed(const Duration(seconds: 1));
 
     //Positions =>
     List<Position> positions = await NetworkManager().getPositions();
@@ -95,16 +94,13 @@ class DashboardBloc extends Bloc<DashboardBlocEvent, DashboardBlocState> {
         positions.where((element) => (element.isOpened && !element.coin.isStable)).toList();
     double crypto = lstOpenedCrypto.map((e) => e.currentValue).sum;
     emit(state.copyWith(crypto: crypto));
-    await Future.delayed(const Duration(seconds: 1));
 
     List<Position> lstOpenedStable = positions.where((element) => (element.isOpened && element.coin.isStable)).toList();
     double stable = lstOpenedStable.map((e) => e.currentValue).sum;
     emit(state.copyWith(stable: stable));
-    await Future.delayed(const Duration(seconds: 1));
 
     double total = crypto + stable;
     emit(state.copyWith(total: total));
-    await Future.delayed(const Duration(seconds: 1));
 
     //Deposits =>
     List<Deposit> deposits = await NetworkManager().getDeposits();
@@ -112,18 +108,15 @@ class DashboardBloc extends Bloc<DashboardBlocEvent, DashboardBlocState> {
     Cryptocurrency eurt = await NetworkManager().getCryptocurrency(87);
     double depositsValue = depositsValueEur * eurt.priceUsd;
     emit(state.copyWith(invested: depositsValue));
-    await Future.delayed(const Duration(seconds: 1));
 
     //Loans =>
     List<Loan> loans = await NetworkManager().getLoans();
     double loansValue = loans.map((e) => e.currentValue).sum;
     emit(state.copyWith(loan: loansValue));
-    await Future.delayed(const Duration(seconds: 1));
 
     //Percents =>
     double percentWinLose = (total * 100 / depositsValue) - 100.0;
     emit(state.copyWith(percentWinLose: percentWinLose.toInt()));
-    await Future.delayed(const Duration(seconds: 1));
 
     //Farming =>
     List<FarmingSimple> farmings = await NetworkManager().getSimpleFarmings();
@@ -131,16 +124,13 @@ class DashboardBloc extends Bloc<DashboardBlocEvent, DashboardBlocState> {
     double annualFarmingSimple = farmings.map((e) => e.annualRewards).sum;
     double annualFarmingLp = lps.map((e) => e.annualRewards).sum;
     emit(state.copyWith(annualFarming: (annualFarmingSimple + annualFarmingLp) / 12));
-    await Future.delayed(const Duration(seconds: 1));
 
     //Charts =>
     Map<Cryptocurrency, double> mapChartCrypto = generateMapForChart(lstOpenedCrypto);
     emit(state.copyWith(mapChartCrypto: mapChartCrypto));
-    await Future.delayed(const Duration(seconds: 1));
 
     Map<Cryptocurrency, double> mapChartStable = generateMapForChart(lstOpenedStable);
     emit(state.copyWith(mapChartStable: mapChartStable));
-    await Future.delayed(const Duration(seconds: 1));
 
     emit(state.copyWith(status: ViewStatus.success));
   }
