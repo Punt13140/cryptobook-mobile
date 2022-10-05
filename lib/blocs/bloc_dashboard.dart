@@ -84,7 +84,7 @@ class DashboardBloc extends Bloc<DashboardBlocEvent, DashboardBlocState> {
     add(const LoadDashboardEvent());
   }
 
-  void loadDashboard(LoadDashboardEvent event, Emitter<DashboardBlocState> emit) async {
+  Future<void> loadDashboard(LoadDashboardEvent event, Emitter<DashboardBlocState> emit) async {
     emit(state.copyWith(status: ViewStatus.loading));
 
     //Positions =>
